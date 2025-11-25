@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+yfinance
+newspaper3k
+googlenews
+pydantic
+python-dotenv
+google-generativeai
+dateparser
+duckduckgo-search
+requests
+beautifulsoup4
+googlesearch-python
