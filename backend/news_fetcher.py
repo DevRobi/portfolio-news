@@ -76,9 +76,9 @@ def is_valid_source(article: dict) -> bool:
     Filters out unwanted sources, specifically Zacks Research.
     Returns True if the source is valid, False otherwise.
     """
-    # Check title
+    # Check title for Zacks and other spammy keywords
     title = article.get('title', '').lower()
-    if 'zacks' in title:
+    if 'zacks' in title or 'zack' in title:
         return False
         
     # Check publisher/source

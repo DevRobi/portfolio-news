@@ -1,35 +1,37 @@
 import requests
 import json
+import logging
 
-def generate_with_qwen(prompt: str, model: str = "llama3:8b") -> str:
+logger = logging.getLogger(__name__)
+
+def generate_with_llama(prompt: str, model: str = "llama3:8b") -> str:
     """
-    Generate text using local LLM via Ollama.
+    Generates text using a local Ollama instance running Llama 3.
     
     Args:
-        prompt: The prompt to send to the model
-        model: The model name (default: llama3:8b)
-    
+        prompt: The input text prompt.
+        model: The model tag to use (default: "llama3:8b").
+        
     Returns:
-        Generated text response
+        The generated text, or None if the request fails.
     """
     url = "http://localhost:11434/api/generate"
-    data = {
+    
+    payload = {
         "model": model,
         "prompt": prompt,
-        "stream": False,  # Set to True if you want streaming responses
-        "num_ctx": 8192,  # Reduced from 200k to prevent stalling on local hardware
-        "num_predict": 2500,  # ~2000-2500 tokens needed for 30-50 sentences
-        "temperature": 0.7  # Balanced creativity for financial writing
+        "stream": False,
+        "options": {
+            "temperature": 0.3,
+            "num_ctx": 8192
+        }
     }
     
     try:
-        # Increased timeout to 300 seconds for longer generations and model loading
-        response = requests.post(url, json=data, timeout=300)
+        response = requests.post(url, json=payload)
         response.raise_for_status()
-        
         result = response.json()
-        return result.get('response', '')
-        
+        return result.get("response", "")
     except requests.exceptions.ConnectionError:
         print("Error: Could not connect to Ollama. Make sure it's running on localhost:11434")
         print("Run 'ollama serve' to start the server")

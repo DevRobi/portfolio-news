@@ -13,3 +13,58 @@ news sites for very high level insight gathering. This project aims at conveying
 terrible news sources and unnecessary noise, producing a report for each stock in your portfolio which combines all the recent news.
 I think this should be useful for retail investors to effectively read news, never miss a detail and save time by focusing on 
 news that really matter. The medium term goal is to build a somewhat agentic value investing framework that integrates this project.
+
+## Technical Requirements
+
+To run this project locally, you will need:
+- **Python 3.8+**
+- **Node.js 16+**
+- **Ollama** (for local LLM inference)
+- **Llama 3 Model** (`llama3:8b`)
+
+## Getting Started
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/DevRobi/portfolio-news.git
+cd portfolio-news
+```
+
+### 2. Backend Setup
+Create a virtual environment and install dependencies:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Frontend Setup
+Install Node.js dependencies:
+```bash
+cd ../frontend
+npm install
+```
+
+### 4. LLM Setup
+Install [Ollama](https://ollama.com/) and pull the Llama 3 model:
+```bash
+ollama pull llama3:8b
+ollama serve
+```
+
+### 5. Running the Application
+Start the backend (in one terminal):
+```bash
+# In /backend
+source venv/bin/activate
+uvicorn main:app --reload
+```
+
+Start the frontend (in another terminal):
+```bash
+# In /frontend
+npm run dev
+```
+
+Open your browser and navigate to `http://localhost:5173`.
