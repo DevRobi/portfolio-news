@@ -12,4 +12,4 @@ Value Line, S&P Capital IQ, Value Investors Club, SEC Edgar, Mergent Atlas, magi
 news sites for very high level insight gathering. This project aims at conveying news in a pleasant format that filters out
 terrible news sources and unnecessary noise, producing a report for each stock in your portfolio which combines all the recent news.
 I think this should be useful for retail investors to effectively read news, never miss a detail and save time by focusing on 
-news that really matter.
+news that really matter. The medium term goal is to build a somewhat agentic value investing framework that integrates this project.
