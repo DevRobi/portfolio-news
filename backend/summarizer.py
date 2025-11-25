@@ -49,8 +49,9 @@ TODAY'S DATE: {datetime.date.today().strftime('%B %d, %Y')}
 IMPORTANT: Prioritize news from the last 7 days. If an article is older than 30 days, explicitly note it as historical context or ignore it if irrelevant.
 
 MANDATORY LENGTH REQUIREMENT:
-Your report MUST be AT LEAST 50 sentences long, and ideally closer to 100 sentences. 
-This is a detailed, deep-dive analysis. DO NOT write fewer than 50 sentences under any circumstances.
+Aim for 50+ sentences of detailed analysis.
+Your report MUST be AT LEAST 50 sentences long.
+DO NOT write fewer than 50 sentences.
 
 COUNT YOUR SENTENCES AS YOU WRITE. After every few sentences, pause and count to ensure you're meeting the requirement.
 
@@ -60,7 +61,7 @@ STRICT NEGATIVE CONSTRAINT:
 2. NO SOURCES IN TEXT: Do not list sources or say "According to...". Integrate facts directly.
 3. NO ZACKS/SLOP: ABSOLUTELY NO CONTENT FROM ZACKS INVESTMENT RESEARCH. If any data seems to come from Zacks, IGNORE IT. Do not use phrases like "Zacks Rank" or "Strong Buy".
 4. NO COMPETITOR DRIFT: Stay laser-focused on {ticker}. You may mention competitors for context (e.g., "Competitor X reported earnings..."), but DO NOT devote entire paragraphs to them. The report is about {ticker}, not its peers. IF A PARAGRAPH IS PRIMARILY ABOUT ANOTHER COMPANY (e.g., American Tower, AMT), DELETE IT.
-5. NO SENTENCE COUNT: Do not state the sentence count in your output.
+5. NO SENTENCE COUNT: DO NOT include a sentence count or "Sentence count: X" at the end of the report. Just end with the conclusion.
 
 PHILOSOPHY & TONE:
 Adopt the persona of a rational, value-oriented investor (inspired by Charlie Munger). 
