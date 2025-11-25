@@ -7,7 +7,7 @@ objectively garbage. I made sure that such misleading, harmful and useless news 
 and only important news with substance are kept. I also want to proudly highlight that I am doing my best to eliminate any analyst rating and recommendation from the news sources used, which do more harm than good. This is to make sure that investment decisions are made based on the investor's personal judgement rather than the opinions of some analyst who has 'revolutionary ideas' on a daily basis. Note that this a personal project, not commercial in any way.
 Note that this platform, for now, only serves to report the latest news in a pleasant and concise way to
 shareholders of equities. This is not an investing, data analysis or full scale analysis software by any means.
-If the goal is intelligence and educated stock picking, I highly recommend the following resources:
+If the goal is intelligent and educated stock picking, I highly recommend the following resources:
 Value Line, S&P Capital IQ, Value Investors Club, SEC Edgar, Mergent Atlas, magicformulainvesting.com, Investor Relations pages and
 news sites for very high level insight gathering. This project aims at conveying news in a pleasant format that filters out
 terrible news sources and unnecessary noise, producing a report for each stock in your portfolio which combines all the recent news.
