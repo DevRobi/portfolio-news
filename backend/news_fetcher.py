@@ -494,5 +494,5 @@ def get_aggregated_news(ticker: str):
             seen_urls.add(article['url'])
             unique_news.append(article)
             
-    logger.info(f"Found {len(unique_news)} unique articles from 8 sources (Yahoo, Google, FinViz, MarketWatch, Benzinga, Reuters, Seeking Alpha, IR)")
+    logger.info(f"Found {len(unique_news)} unique articles from all sources (Yahoo Finance, Google News, FinViz, MarketWatch, Benzinga, Reuters, Seeking Alpha, IR)")
     return unique_news

@@ -7,6 +7,41 @@ from llama3 import generate_with_llama
 logger = logging.getLogger(__name__)
 
 import datetime
+import re
+
+def remove_zacks_sentences(text: str) -> str:
+    """
+    Removes any sentences containing 'Zacks' or 'Zacks Research' from the generated text.
+    This is a post-processing step to ensure no Zacks content slips through.
+    
+    Args:
+        text: The generated summary text
+        
+    Returns:
+        Text with Zacks sentences removed
+    """
+    if not text:
+        return text
+    
+    # Split into sentences (handles common sentence endings)
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    
+    # Filter out sentences containing 'zacks' (case-insensitive)
+    filtered_sentences = []
+    removed_count = 0
+    
+    for sentence in sentences:
+        if 'zacks' in sentence.lower():
+            logger.info(f"Removed Zacks sentence: {sentence[:100]}...")
+            removed_count += 1
+        else:
+            filtered_sentences.append(sentence)
+    
+    if removed_count > 0:
+        logger.warning(f"Post-processing removed {removed_count} sentence(s) containing 'Zacks' content")
+    
+    # Rejoin sentences
+    return ' '.join(filtered_sentences)
 
 def generate_summary(ticker: str, articles_data: List[Dict[str, Any]]) -> str:
     """
@@ -45,6 +80,8 @@ def generate_summary(ticker: str, articles_data: List[Dict[str, Any]]) -> str:
     
     prompt = f"""You are a senior financial analyst preparing a comprehensive market intelligence report for {ticker}. This is NOT a brief summary - this is a detailed, thorough analysis report.
     
+NEWS SOURCES: The articles below are from Finviz, Yahoo Finance, and Google News.
+
 TODAY'S DATE: {datetime.date.today().strftime('%B %d, %Y')}
 IMPORTANT: Prioritize news from the last 7 days. If an article is older than 30 days, explicitly note it as historical context or ignore it if irrelevant.
 
@@ -56,11 +93,15 @@ DO NOT write fewer than 50 sentences.
 COUNT YOUR SENTENCES AS YOU WRITE. After every few sentences, pause and count to ensure you're meeting the requirement.
 
 
-STRICT NEGATIVE CONSTRAINT:
+STRICT NEGATIVE CONSTRAINTS:
 1. NO ANALYST OPINIONS: Do not mention analyst recommendations, price targets, "buy/sell" ratings, or "upside potential". These are opinions, not facts. We care about business fundamentals, not speculation.
+
 2. NO SOURCES IN TEXT: Do not list sources or say "According to...". Integrate facts directly.
-3. NO ZACKS/SLOP: ABSOLUTELY NO CONTENT FROM ZACKS INVESTMENT RESEARCH. If any data seems to come from Zacks, IGNORE IT. Do not use phrases like "Zacks Rank" or "Strong Buy".
-4. NO COMPETITOR DRIFT: Stay laser-focused on {ticker}. You may mention competitors for context (e.g., "Competitor X reported earnings..."), but DO NOT devote entire paragraphs to them. The report is about {ticker}, not its peers. IF A PARAGRAPH IS PRIMARILY ABOUT ANOTHER COMPANY (e.g., American Tower, AMT), DELETE IT.
+
+3. ABSOLUTELY NO ZACKS: ZERO TOLERANCE for Zacks Investment Research content. If you encounter ANY information that mentions Zacks, Zacks Research, "Zacks Rank", "Strong Buy" ratings from Zacks, or any Zacks-related terms, IGNORE IT COMPLETELY. Do not use it. Do not reference it. Do not include any sentence that contains the word "Zacks" in any form. This is MANDATORY.
+
+4. TICKER FOCUS ONLY: This report is EXCLUSIVELY about {ticker}. You may BRIEFLY mention competitors or industry dynamics for context (maximum 1-2 sentences per competitor), but DO NOT write lengthy analysis about other companies. If you find yourself writing 3+ sentences about a competitor or devoting an entire paragraph to another company (e.g., American Tower, AMT, or any other ticker), STOP immediately and refocus on {ticker}. The reader only cares about {ticker}.
+
 5. NO SENTENCE COUNT: DO NOT include a sentence count or "Sentence count: X" at the end of the report. Just end with the conclusion.
 
 PHILOSOPHY & TONE:
@@ -100,8 +141,11 @@ Begin your detailed report now (REMEMBER: minimum 50 sentences, target 50-100):"
             print(llama_response)
             print(f"{'='*50}\n")
             
+            # Post-process to remove any Zacks sentences
+            cleaned_response = remove_zacks_sentences(llama_response)
+            
             logger.info(f"Successfully generated summary with Llama 3 for {ticker}")
-            return llama_response
+            return cleaned_response
         else:
             logger.warning("Llama 3 returned empty response, falling back to Gemini")
     except Exception as e:
@@ -130,7 +174,10 @@ Recent news for {ticker} suggests active market movements. {len(articles_data)} 
         response = model.generate_content(prompt)
         logger.info(f"Successfully generated summary with Gemini for {ticker}")
         
-        return response.text.strip()
+        # Post-process to remove any Zacks sentences
+        cleaned_response = remove_zacks_sentences(response.text.strip())
+        
+        return cleaned_response
         
     except Exception as e:
         logger.error(f"Error generating summary with Gemini: {e}")
