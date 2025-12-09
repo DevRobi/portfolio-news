@@ -1,9 +1,8 @@
 # portfolio-news
 AI news summaries for your stock portfolio.
 This is a webapp that summarizes recent news for each stock in your portfolio. This way, you don't have to google company specific news, 
-read the news provided by your brokerage service, waste your time on ads, scroll through unrelated news, read useless noise and low quality financial slop, and the best part is that all the news are automatically delivered to
-you, summarized. I also got sick of the quality of financial news slop such as Zacks Investment Research which is 
-objectively garbage. I made sure that such misleading, harmful and useless news sources are completely filtered out
+read the news provided by your brokerage service, waste your time on ads, scroll through unrelated news, read useless noise and low quality sources, and the best part is that all the news are automatically delivered to
+you, summarized. I also got tired of low quality financial news such as Zacks Investment Research which I filtered out completely from summaries. I made sure that such misleading, harmful and useless news sources are completely filtered out
 and only important news with substance are kept. I also want to proudly highlight that I am doing my best to eliminate any analyst rating and recommendation from the news sources used, which do more harm than good. This is to make sure that investment decisions are made based on the investor's personal judgement rather than the opinions of some analyst who has 'revolutionary ideas' on a daily basis. Note that this a personal project, not commercial in any way.
 Note that this platform, for now, only serves to report the latest news in a pleasant and concise way to
 shareholders of equities. This is not an investing, data analysis or full scale analysis software by any means.
