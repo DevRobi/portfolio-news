@@ -14,7 +14,7 @@ const Dashboard = () => {
     const fetchStockNews = async (ticker) => {
         setLoadingStocks(prev => ({ ...prev, [ticker]: true }));
         try {
-            const newsRes = await axios.get(`http://localhost:8000/api/news/${ticker}`);
+            const newsRes = await axios.get(`http://localhost:8000/api/news/${encodeURIComponent(ticker)}`);
             setStockData(prev => ({ ...prev, [ticker]: newsRes.data }));
         } catch (error) {
             console.error(`Error fetching news for ${ticker}:`, error);
@@ -51,7 +51,7 @@ const Dashboard = () => {
         if (!window.confirm(`Are you sure you want to remove ${ticker} from your portfolio?`)) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/portfolio/${ticker}`);
+            await axios.delete(`http://localhost:8000/api/portfolio/${encodeURIComponent(ticker)}`);
             setPortfolio(prev => prev.filter(t => t !== ticker));
             setStockData(prev => {
                 const newData = { ...prev };
@@ -68,7 +68,14 @@ const Dashboard = () => {
             // 1. Get Portfolio
             const portfolioRes = await axios.get('http://localhost:8000/api/portfolio');
             const tickers = portfolioRes.data.portfolio;
+
+            // Pre-set loading state for all tickers so cards show loading spinners
+            const initialLoadState = {};
+            tickers.forEach(t => initialLoadState[t] = true);
+            setLoadingStocks(initialLoadState);
+
             setPortfolio(tickers);
+            setInitialLoading(false); // Show dashboard immediately
 
             // 2. Fetch news for all tickers with concurrency limit
             // Browser connection limit is usually 6. We limit to 3 to leave room for other actions (like adding tickers).
@@ -89,7 +96,6 @@ const Dashboard = () => {
             await Promise.all(workers);
         } catch (error) {
             console.error("Error fetching portfolio:", error);
-        } finally {
             setInitialLoading(false);
         }
     };
@@ -118,12 +124,28 @@ const Dashboard = () => {
 
                     <div className="flex items-center gap-4">
                         <form onSubmit={handleAddTicker} className="flex items-center gap-2">
+                            <select
+                                className="px-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all cursor-pointer [&>option]:text-black"
+                                onChange={(e) => {
+                                    if (e.target.value) setNewTicker(e.target.value);
+                                }}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Instrument Type</option>
+                                <option value="STOCK">Stock (Custom)</option>
+                                <option value="GC=F">Gold</option>
+                                <option value="SI=F">Silver</option>
+                                <option value="CL=F">Crude Oil</option>
+                                <option value="^TNX">10Y Treasury</option>
+                                <option value="BTC-USD">Bitcoin</option>
+                                <option value="ETH-USD">Ethereum</option>
+                            </select>
                             <input
                                 type="text"
                                 value={newTicker}
                                 onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
-                                placeholder="Add Ticker (e.g. AAPL)"
-                                className="px-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all w-48"
+                                placeholder="Ticker (e.g. AAPL)"
+                                className="px-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all w-32"
                                 disabled={adding}
                             />
                             <button

@@ -471,21 +471,40 @@ def get_ir_news(ticker: str, company_name: str = None):
 
 def get_aggregated_news(ticker: str):
     """Aggregates news from multiple sources."""
-    # Get company name first for better search queries
-    company_name = get_company_info(ticker)
-    logger.info(f"Fetching news for {ticker} ({company_name})")
+    # Get company name and type first
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        company_name = info.get('longName') or info.get('shortName') or ticker
+        quote_type = info.get('quoteType', '').upper()
+    except Exception as e:
+        logger.warning(f"Error getting info for {ticker}: {e}")
+        company_name = ticker
+        quote_type = 'UNKNOWN'
+
+    logger.info(f"Fetching news for {ticker} ({company_name}) [Type: {quote_type}]")
     
-    yahoo_news = get_yahoo_news(ticker)
-    google_news = get_google_news(ticker, company_name)
-    finviz_news = get_finviz_news(ticker)
-    marketwatch_news = get_marketwatch_news(ticker, company_name)
-    benzinga_news = get_benzinga_news(ticker)
-    reuters_news = get_reuters_news(ticker, company_name)
-    seekingalpha_news = get_seekingalpha_news(ticker)
-    ir_news = get_ir_news(ticker, company_name)
+    # Define types that should use all sources (Stocks/ETFs)
+    # Everything else (Crypto, Futures, Indices, etc.) uses only Google News
+    STOCK_TYPES = ['EQUITY', 'ETF']
     
-    # Combine and deduplicate based on URL
-    all_news = yahoo_news + google_news + finviz_news + marketwatch_news + benzinga_news + reuters_news + seekingalpha_news + ir_news
+    if quote_type in STOCK_TYPES:
+        yahoo_news = get_yahoo_news(ticker)
+        google_news = get_google_news(ticker, company_name)
+        finviz_news = get_finviz_news(ticker)
+        marketwatch_news = get_marketwatch_news(ticker, company_name)
+        benzinga_news = get_benzinga_news(ticker)
+        reuters_news = get_reuters_news(ticker, company_name)
+        seekingalpha_news = get_seekingalpha_news(ticker)
+        ir_news = get_ir_news(ticker, company_name)
+        
+        all_news = yahoo_news + google_news + finviz_news + marketwatch_news + benzinga_news + reuters_news + seekingalpha_news + ir_news
+    else:
+        logger.info(f"Non-stock instrument ({quote_type}), restricting to Google News.")
+        # For crypto/futures, Google News with the name is usually best
+        all_news = get_google_news(ticker, company_name)
+    
+    # Deduplicate based on URL
     seen_urls = set()
     unique_news = []
     
@@ -494,5 +513,5 @@ def get_aggregated_news(ticker: str):
             seen_urls.add(article['url'])
             unique_news.append(article)
             
-    logger.info(f"Found {len(unique_news)} unique articles from 8 sources (Yahoo, Google, FinViz, MarketWatch, Benzinga, Reuters, Seeking Alpha, IR)")
+    logger.info(f"Found {len(unique_news)} unique articles for {ticker}")
     return unique_news

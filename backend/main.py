@@ -7,6 +7,8 @@ import logging
 
 from news_fetcher import get_aggregated_news, get_article_content
 from summarizer import generate_summary
+import yfinance as yf
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +46,10 @@ import os
 
 PORTFOLIO_FILE = "portfolio.json"
 
+# Simple in-memory cache: {ticker: (data, timestamp)}
+news_cache = {}
+CACHE_DURATION = 3600  # 1 hour
+
 def load_portfolio():
     if os.path.exists(PORTFOLIO_FILE):
         try:
@@ -51,7 +57,7 @@ def load_portfolio():
                 return json.load(f)
         except Exception as e:
             logger.error(f"Error loading portfolio: {e}")
-    return ["BUR", "UNH"]  # Default if file doesn't exist or error
+    return ["DHI", "BUR"]  # Default if file doesn't exist or error
 
 def save_portfolio(portfolio_list):
     try:
@@ -73,11 +79,33 @@ def get_portfolio():
 @app.post("/api/portfolio")
 def add_ticker(request: TickerRequest):
     ticker = request.ticker.upper()
-    if ticker not in portfolio:
-        portfolio.append(ticker)
+    
+    # Smart Ticker Resolution
+    # 1. Check if valid as is
+    final_ticker = ticker
+    try:
+        info = yf.Ticker(ticker).info
+        # If it has no quoteType, it might be invalid, but yfinance is tricky.
+        # Usually invalid tickers return empty info or raise error.
+        if not info or 'quoteType' not in info:
+            raise ValueError("Invalid ticker")
+    except:
+        # 2. Try adding -USD for crypto
+        try:
+            crypto_ticker = f"{ticker}-USD"
+            info = yf.Ticker(crypto_ticker).info
+            if info and 'quoteType' in info:
+                final_ticker = crypto_ticker
+                logger.info(f"Auto-resolved {ticker} to {final_ticker}")
+        except:
+            # If both fail, keep original and let it fail later or be handled as unknown
+            pass
+
+    if final_ticker not in portfolio:
+        portfolio.append(final_ticker)
         save_portfolio(portfolio)
-        return {"message": f"Added {ticker} to portfolio", "portfolio": portfolio}
-    return {"message": f"{ticker} already in portfolio", "portfolio": portfolio}
+        return {"message": f"Added {final_ticker} to portfolio", "portfolio": portfolio}
+    return {"message": f"{final_ticker} already in portfolio", "portfolio": portfolio}
 
 @app.delete("/api/portfolio/{ticker}")
 def remove_ticker(ticker: str):
@@ -90,6 +118,14 @@ def remove_ticker(ticker: str):
 
 @app.get("/api/news/{ticker}", response_model=StockSummary)
 def get_stock_news(ticker: str):
+    # Check cache first
+    current_time = time.time()
+    if ticker in news_cache:
+        cached_data, timestamp = news_cache[ticker]
+        if current_time - timestamp < CACHE_DURATION:
+            logger.info(f"Serving cached news for {ticker}")
+            return cached_data
+
     logger.info(f"Fetching news for {ticker}")
     
     # 1. Fetch news articles
