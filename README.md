@@ -34,7 +34,7 @@ cd portfolio-news
 Create a virtual environment and install dependencies:
 ```bash
 cd backend
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
@@ -50,13 +50,15 @@ npm install
 Install [Ollama](https://ollama.com/) and pull the Llama 3 model:
 ```bash
 ollama pull llama3:8b
-ollama serve
+ollama run llama3:8b
 ```
 
 ### 5. Running the Application
 Start the backend (in one terminal):
 ```bash
 # In /backend
+cd portfolio-news
+cd backend
 source venv/bin/activate
 uvicorn main:app --reload
 ```
@@ -64,6 +66,8 @@ uvicorn main:app --reload
 Start the frontend (in another terminal):
 ```bash
 # In /frontend
+cd portfolio-news
+cd frontend
 npm run dev
 ```
 
