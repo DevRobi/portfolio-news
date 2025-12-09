@@ -14,7 +14,8 @@ I think this should be useful for retail investors to effectively read news, nev
 news that really matter. The medium term goal is to build a somewhat agentic value investing framework that integrates this project.
 
 ## Technical Requirements
-
+To preface, an open-source LLM, llama3:8b is used for summarizing news. The rest of the code was implemented from scratch completely, using exsiting
+python3 libraries, and the NodeJS framework for frontend.
 To run this project locally, you will need:
 - **Python 3.8+**
 - **Node.js 16+**
