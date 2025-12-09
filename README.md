@@ -54,7 +54,7 @@ ollama run llama3:8b
 ```
 
 ### 5. Running the Application
-Start the backend (in one terminal):
+Start the backend (in another terminal):
 ```bash
 # In /backend
 cd portfolio-news
@@ -71,4 +71,4 @@ cd frontend
 npm run dev
 ```
 
-Open your browser and navigate to `http://localhost:5173`.
+Open your browser and navigate to `http://localhost:5173`. It might take a minute to fetch and summarize news for the default tickers.
