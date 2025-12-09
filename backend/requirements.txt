@@ -11,3 +11,4 @@ duckduckgo-search
 requests
 beautifulsoup4
 googlesearch-python
+lxml_html_clean
